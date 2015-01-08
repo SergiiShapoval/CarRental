@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+<display-name>Archetype Created Web Application</display-name>
+
+
+    <welcome-file-list>
+        <welcome-file>/index</welcome-file>
+    </welcome-file-list>
+    <context-param>
+        <param-name>tilesDefinitions</param-name>
+        <param-value>/WEB-INF/defs/general.xml</param-value>
+    </context-param>
+
+    <listener>
+        <!--<listener-class>org.apache.tiles.extras.complete.CompleteAutoloadTilesListener</listener-class>-->
+        <listener-class>org.apache.tiles.web.startup.simple.SimpleTilesListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>MainServlet</servlet-name>
+        <servlet-class>ua.sergiishapoval.carrental.controller.MainServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MainServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>Tiles Dispatch Servlet</servlet-name>
+        <servlet-class>org.apache.tiles.web.util.TilesDispatchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Tiles Dispatch Servlet</servlet-name>
+        <url-pattern>*.tiles</url-pattern>
+    </servlet-mapping>
+
+
+    <!--DB Connection start-->
+    <resource-ref>
+        <res-ref-name>jdbc/test</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+    <context-param>
+        <param-name>javax.faces.CONFIG_FILES</param-name>
+        <param-value>/META-INF/context.xml</param-value>
+    </context-param>
+    <!--DB Connection end-->
+
+
+    <!--encoding filter start-->
+    <filter>
+
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>ua.sergiishapoval.carrental.filter.EncodingFilter</filter-class>
+
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        
+
+    </filter>
+
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!--encoding filter end-->
+
+
+</web-app>

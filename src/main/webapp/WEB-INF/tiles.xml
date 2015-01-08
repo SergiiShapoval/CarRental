@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions [
+        <!ELEMENT tiles-definitions (definition)*>
+        <!ELEMENT definition (put-attribute)*>
+        <!ATTLIST definition
+                extends CDATA #IMPLIED
+                name CDATA #REQUIRED
+                template CDATA #IMPLIED>
+        <!ELEMENT put-attribute (#PCDATA)>
+        <!ATTLIST put-attribute
+                name CDATA #REQUIRED
+                value CDATA #REQUIRED>
+        ]>
+<tiles-definitions>
+
+       <definition name="common" template="/WEB-INF/layout/template.jsp">
+              <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
+              <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
+              <put-attribute name="menu" value="/WEB-INF/layout/menu.jsp" />
+       </definition>
+       <definition name="registration" extends="common" >
+              <put-attribute name="title" value="Registration page" />
+              <put-attribute name="body" value="/WEB-INF/jsp/registration.jsp" />
+       </definition>
+       <definition name="index" extends="common" >
+              <put-attribute name="title" value="Main page" />
+              <put-attribute name="body" value="/WEB-INF/jsp/index.jsp" />
+       </definition>
+       <definition name="recover" extends="common" >
+              <put-attribute name="title" value="Recovering page" />
+              <put-attribute name="body" value="/WEB-INF/jsp/recover.jsp" />
+       </definition>
+       <definition name="info" extends="common" >
+              <put-attribute name="title" value="Info page" />
+              <put-attribute name="body" value="/WEB-INF/jsp/info.jsp" />
+       </definition>  
+       <definition name="cars" extends="common" >
+              <put-attribute name="title" value="List of cars for rent" />
+              <put-attribute name="body" value="/WEB-INF/jsp/cars.jsp" />
+       </definition>
+       <definition name="searchcar" extends="common" >
+              <put-attribute name="title" value="Search car" />
+              <put-attribute name="body" value="/WEB-INF/jsp/searchcar.jsp" />
+       </definition>
+       <definition name="reserve" extends="common" >
+              <put-attribute name="title" value="Car reservation" />
+              <put-attribute name="body" value="/WEB-INF/jsp/reserve.jsp" />
+       </definition>
+       <definition name="my_new_orders" extends="common" >
+              <put-attribute name="title" value="My new orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/my_data.jsp" />
+       </definition>
+       <definition name="my_rejected_orders" extends="common" >
+              <put-attribute name="title" value="My rejected orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/my_data.jsp" />
+       </definition>
+       <definition name="my_approved_orders" extends="common" >
+              <put-attribute name="title" value="My current orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/my_data.jsp" />
+       </definition>
+       <definition name="my_closed_orders" extends="common" >
+              <put-attribute name="title" value="My order archive" />
+              <put-attribute name="body" value="/WEB-INF/jsp/my_data.jsp" />
+       </definition>
+       <definition name="all_new_orders" extends="common" >
+              <put-attribute name="title" value="New orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/all_data.jsp" />
+       </definition>
+       <definition name="all_approved_orders" extends="common" >
+              <put-attribute name="title" value="Approved orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/all_data.jsp" />
+       </definition>
+       <definition name="all_rejected_orders" extends="common" >
+              <put-attribute name="title" value="Rejected orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/all_data.jsp" />
+       </definition>
+       <definition name="all_closed_orders" extends="common" >
+              <put-attribute name="title" value="Rejected orders" />
+              <put-attribute name="body" value="/WEB-INF/jsp/all_data.jsp" />
+       </definition>
+       <definition name="order" extends="common" >
+              <put-attribute name="title" value="Order edit" />
+              <put-attribute name="body" value="/WEB-INF/jsp/order.jsp" />
+       </definition>
+       <definition name="user" extends="common" >
+              <put-attribute name="title" value="User info" />
+              <put-attribute name="body" value="/WEB-INF/jsp/user.jsp" />
+       </definition>
+</tiles-definitions>
