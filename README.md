@@ -12,3 +12,11 @@ Prerequisites for installation: MySql server, with carrental database created, i
 To deploy: checkout repository, go to downloaded dir, with pom.xml in cmd.exe and start the app by "mvn clean  tomcat:run-war".
 
 See short overview here - https://www.youtube.com/watch?v=GYlZDrNa72E
+
+Preview:
+https://www.diigo.com/item/image/51cvc/duim
+https://www.diigo.com/item/image/51cvc/i8e9
+https://www.diigo.com/item/image/51cvc/kiye
+https://www.diigo.com/item/image/51cvc/n1e0
+https://www.diigo.com/item/image/51cvc/sh3y
+https://www.diigo.com/item/image/51cvc/b47h
