@@ -133,8 +133,7 @@
     </div>
     <%--search results end--%>
 
-    <%--pagination logic start--%>
-
+<%--pagination logic start--%>
     <c:url var="firstUrl" value="/searchcar/pages/1" />
     <c:url var="lastUrl" value="/searchcar/pages/${totalPages}" />
     <c:url var="prevUrl" value="/searchcar/pages/${currentIndex - 1}" />

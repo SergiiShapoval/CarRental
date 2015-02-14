@@ -13,9 +13,7 @@
             </div>
         </c:when>
         <%--Salutation when logged in end--%>
-
         <c:otherwise>
-
             <form action="" method="post" class="form-horizontal">
                     <%--Email field begin --%>
                 <c:choose>
@@ -70,6 +68,7 @@
             <a href="/registration" class="small"><fmt:message key="REGISTRATION"/> </a> | <a href="/recover" class="small"><fmt:message key="FORGOT"/> </a>
         </c:otherwise>
     </c:choose>
+
     <%--links accessible for all start--%>
     <br/>
     <br/>
@@ -87,8 +86,6 @@
             <p><a href="/all_rejected_orders" class=""><fmt:message key="ALL_REJECTED_ORDERS"/></a></p>
             <p><a href="/all_closed_orders" class=""><fmt:message key="ALL_CLOSED_ORDERS"/></a></p>
         </c:when>
-
-        
     </c:choose>
     <%--links accessible for all end--%>
 </div>

@@ -7,12 +7,9 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <h1 align="center"><fmt:message key="REGISTRATION_PAGE_TITLE"/></h1>
-
 <form action="/registration" method="post" class="form-horizontal">
   <%--First name field begin --%>
-
   <%--error handling start--%>
   <c:choose>
     <c:when test="${not empty userError.firstname}">
@@ -35,7 +32,6 @@
     </div>
   </div>
   <%--First name field end --%>
-
   <%--Last name field begin --%>
     <%--error handling start--%>
   <c:choose>
@@ -106,7 +102,6 @@
     </div>
   </div>
   <%--Passport field end --%>
-
   <%--Password field begin --%>
     <%--error handling start--%>
   <c:choose>
@@ -144,22 +139,5 @@
     </div>
   </div>
 </form>
-
-
-<%--
-  <div class="form-group">
-    <c:if test="${not empty userError.password}">
-      <div class="alert alert-danger" role="alert">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <span class="sr-only"><fmt:message key="ERROR"/>:</span>
-           <fmt:message key="${userError.password}"/>
-      </div>
-    </c:if>
-    <label for="password" class="col-md-2 control-label">Password</label>
-    <div class="col-md-10">
-      <input class="form-control"  id="password" name="password" type="password"  value="${user.password}" placeholder="password"/>
-    </div>
-  </div>
---%>
 
 

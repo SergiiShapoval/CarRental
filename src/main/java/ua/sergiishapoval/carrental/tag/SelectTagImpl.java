@@ -10,9 +10,9 @@ import java.io.IOException;
  * Created by Сергей on 17.12.2014.
  */
 public class SelectTagImpl extends BodyTagSupport {
-    String selected;
-    String className;
-    String id;
+    private String selected;
+    private String className;
+    private String id;
 
 
     public void setSelected(String selected) {
@@ -42,10 +42,17 @@ public class SelectTagImpl extends BodyTagSupport {
     public int doEndTag ()throws JspException {
         BodyContent bodyContent = getBodyContent();
         if(bodyContent==null){ return SKIP_BODY; }
+        StringBuilder stringBuilder = buildSelect(bodyContent);
+        try {
+            pageContext.getOut().print(stringBuilder.toString());
+        } catch (IOException e) {
+            throw new JspException(e.getMessage());
+        }
+        return EVAL_PAGE;
+    }
 
+    private StringBuilder buildSelect(BodyContent bodyContent) {
         StringBuilder stringBuilder = new StringBuilder();
-
-
         stringBuilder.append("<select");
         if (className != null){
             stringBuilder.append(" class=\"" + className + "\"");
@@ -55,22 +62,10 @@ public class SelectTagImpl extends BodyTagSupport {
             stringBuilder.append(" name=\"" + id + "\"");
         }
         stringBuilder.append(">");
-
-
         String tagBody = bodyContent.getString();
-
         tagBody= tagBody.replaceFirst(">"+ selected, " selected>" + selected);
-
-
         stringBuilder.append(tagBody);
         stringBuilder.append("<select>");
-
-
-        try {
-            pageContext.getOut().print(stringBuilder.toString());
-        } catch (IOException e) {
-            throw new JspException(e.getMessage());
-        }
-        return EVAL_PAGE;
+        return stringBuilder;
     }
 }

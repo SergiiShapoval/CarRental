@@ -12,7 +12,6 @@
 <h1 align="center"><fmt:message key="${message}"/></h1>
 
 <%--My order data start--%>
-
 <table class="table table-striped table-bordered table-hover table-condensed">
   <tbody>
   <tr>

@@ -64,12 +64,8 @@
   <p class="bg-danger"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <fmt:message key="${error}" /> </p>
 </c:if>
 <%--restrictions area end--%>
-
-
-
 <div class="row">
   <form role="form" action="" method="post">
-
     <div class="form-group col-md-4">
       <label for="beginDate" class="control-label"><fmt:message key="BEGIN_DATE" /></label>
       <div >
@@ -84,14 +80,12 @@
       </div>
     </div>
 
-    
     <div class="form-group col-md-4">
       <br/>
       <div>
         <button type="submit" class="btn btn-primary form-control ${reserveButtonClass}" name="command" value="reserve"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> <fmt:message key="RESERVE" /></button>
       </div>
     </div>
-
   </form>
 </div>
 
