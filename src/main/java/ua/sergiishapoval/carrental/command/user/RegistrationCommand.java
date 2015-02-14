@@ -41,6 +41,7 @@ public class RegistrationCommand extends CommandTemplate {
             try {
                 DaoUser daoUser = DaoFactory.getDaoUser();
                 daoUser.add(user);
+                daoUser.findByEmail(user);
                 return true;
             } catch (SQLException e) {
                 userErrors.setEmail("DOUBLE_EMAIL");

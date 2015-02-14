@@ -7,7 +7,7 @@
     <tbody>
     <tr>
         <td><fmt:message key="USER_ID"/></td>
-        <td>${userInfo.user_id}</td>
+        <td>${userInfo.userId}</td>
     </tr>
     <tr>
         <td><fmt:message key="FIRST_NAME"/></td>

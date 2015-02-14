@@ -73,7 +73,6 @@ public class DaoUser {
             setProps(user, resultSet);
             return true;
         }
-
         return false;
     }
 

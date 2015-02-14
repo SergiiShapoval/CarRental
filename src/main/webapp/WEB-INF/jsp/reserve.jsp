@@ -46,7 +46,7 @@
 <p><fmt:message key="RESERVE_APPROVAL" /></p>
 
 <%--restrictions area start--%>
-<c:if test="${empty user.user_id}">
+<c:if test="${empty user.userId}">
   <p class="bg-danger"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> <fmt:message key="LOG_IN_WARN" /></p>
   <c:set var="reserveButtonClass" value="disabled"/>
 </c:if>
