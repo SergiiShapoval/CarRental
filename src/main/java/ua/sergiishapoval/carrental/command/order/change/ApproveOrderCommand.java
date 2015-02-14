@@ -20,30 +20,25 @@ public class ApproveOrderCommand extends CommandTemplate {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-        request.getSession().removeAttribute("error");
-
         try {
+            request.getSession().removeAttribute("error");
             int orderId = Integer.parseInt(request.getParameter("id"));
-            Order orderChosen = null;
-            DaoOrder daoOrder = null;
-            try {
-                daoOrder = DaoFactory.getDaoOrder();
-                boolean isUpdated = daoOrder.changeOrderStatus(orderId, "approved");
-                if (isUpdated) {
-                    orderChosen = daoOrder.getOrderDataByOrderId(orderId);
-                    request.getSession().setAttribute("order", orderChosen);
-                } else {
-                    request.getSession().setAttribute("error", "DATABASE_PROBLEM");
-                }
-            } catch (SQLException e) {
+            DaoOrder daoOrder = DaoFactory.getDaoOrder();
+            boolean isUpdated = daoOrder.changeOrderStatus(orderId, "approved");
+            if (isUpdated) {
+                Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+                request.getSession().setAttribute("order", orderChosen);
+            } else {
                 request.getSession().setAttribute("error", "DATABASE_PROBLEM");
-                logger.error("DBError", e);
             }
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("error", "ORDER_BY_ID_REQUEST_FAILED");
             logger.warn("WrongAccessTry", e);
+        } catch (SQLException e) {
+            request.getSession().setAttribute("error", "DATABASE_PROBLEM");
+            logger.error("DBError", e);
         }
-        
+
         dispatcherForward(request, response, request.getRequestDispatcher("/order" +".tiles"));
 
     }

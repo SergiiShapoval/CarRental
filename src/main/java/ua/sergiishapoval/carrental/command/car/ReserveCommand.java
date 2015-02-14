@@ -8,7 +8,6 @@ import ua.sergiishapoval.carrental.dao.DaoFactory;
 import ua.sergiishapoval.carrental.model.Car;
 import ua.sergiishapoval.carrental.model.User;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
@@ -24,81 +23,73 @@ import java.util.List;
 public class ReserveCommand extends CommandTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(ReserveCommand.class);
-    
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-        RequestDispatcher requestDispatcher = null;
-/*user can't choose car in get parameters in security reasons, only through session attributes*/
         if (request.getMethod().toLowerCase().equals("get")){
-            request.getSession().removeAttribute("error");
-            int carId = Integer.parseInt(request.getParameter("id"));
-            List<Car> cars = (List<Car>) request.getSession().getAttribute("cars");
-            Car carChosen = null;
-            for (Car car: cars){
-                if (car.getId() == carId) {
-                    carChosen = car;
-                    break;
-                }
-            }
-            request.getSession().setAttribute("car", carChosen);
+            /*car can be requested only through post*/
+            redirectToReservePageWithCarSetted(request, response);
+            return;
+        }
+
+        Car car = (Car) request.getSession().getAttribute("car");
+        User user = (User) request.getSession().getAttribute("user");
+        String beginDateStr = request.getParameter("beginDate");
+        String endDateStr = request.getParameter("endDate");
+        int dayDifference = getDiffInDays(beginDateStr, endDateStr);
+        if (dayDifference < 1){
+            request.getSession().setAttribute("error", "INCORRECT_DATES");
             dispatcherForward(request, response, request.getRequestDispatcher("/reserve" +".tiles"));
-        } else {
-            Car car = (Car) request.getSession().getAttribute("car");
-            User user = (User) request.getSession().getAttribute("user");
-            String beginDateStr = request.getParameter("beginDate");
-            String endDateStr = request.getParameter("endDate");
+            return;
+        }
 
-            boolean isAnyError = false;
-            String error = null;
-            
-/*verifying dates start*/
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date beginDate = null;
-            Date endDate = null;
-            try {
-                beginDate = (Date)dateFormat.parse(beginDateStr);
-            } catch (ParseException e) {
-                logger.error("DatesRecognition", e);
-            }
-            try {
-                endDate = (Date)dateFormat.parse(endDateStr);
-            } catch (ParseException e) {
-                logger.error("DatesRecognition", e);
-            }
-
-            long timeDifference = endDate.getTime() - beginDate.getTime();
-            int dayDifference = (int) (((timeDifference /1000) / 3600) / 24);
-            if (dayDifference < 1){
-                isAnyError = true;
-                error = "INCORRECT_DATES";
-/*verifying dates end*/
-            } else {
-                DaoCar daoCar = null;
-                try {
-                    daoCar = DaoFactory.getDaoCar();
-                    boolean isAvailableCar = daoCar.checkCarAvailability(car.getId(), beginDateStr, endDateStr);
-                    
-                    if (!isAvailableCar) {
-                        isAnyError = true;
-                        error = "CAR_NOT_AVAILABLE";
-                    } else {
-/*car reservation start*/
-                        daoCar.reserveCar(user.getUserId(), car, beginDateStr, endDateStr, dayDifference );
-/*car reservation end*/
-                    }
-                } catch (SQLException e) {
-                    isAnyError = true;
-                    error = "CAR_RESERVATION_FAIL_SQL";
-                    logger.error("DBError", e);
-                    
-                }
-            }
-            if (isAnyError){
-                request.getSession().setAttribute("error", error);
+        try {
+            DaoCar daoCar = DaoFactory.getDaoCar();
+            if (!daoCar.isCarAvailable(car.getId(), beginDateStr, endDateStr)) {
+                request.getSession().setAttribute("error", "CAR_NOT_AVAILABLE");
                 dispatcherForward(request, response, request.getRequestDispatcher("/reserve" +".tiles"));
             } else {
+                daoCar.reserveCar(user.getUserId(), car, beginDateStr, endDateStr, dayDifference );
                 infoRedirect(request, response, "RESERVE_SUCCESS" );
             }
+        } catch (SQLException e) {
+            request.getSession().setAttribute("error", "CAR_RESERVATION_FAIL_SQL");
+            dispatcherForward(request, response, request.getRequestDispatcher("/reserve" +".tiles"));
+            logger.error("DBError", e);
         }
+    }
+
+    private void redirectToReservePageWithCarSetted(HttpServletRequest request, HttpServletResponse response) {
+        request.getSession().removeAttribute("error");
+        int carId = Integer.parseInt(request.getParameter("id"));
+        Car carChosen = findChosenCar(request, carId);
+        request.getSession().setAttribute("car", carChosen);
+        dispatcherForward(request, response, request.getRequestDispatcher("/reserve" +".tiles"));
+    }
+
+    private Car findChosenCar(HttpServletRequest request, int carId) {
+        List<Car> cars = (List<Car>) request.getSession().getAttribute("cars");
+        Car carChosen = null;
+        for (Car car: cars){
+            if (car.getId() == carId) {
+                carChosen = car;
+                break;
+            }
+        }
+        return carChosen;
+    }
+
+    private int getDiffInDays(String beginDateStr, String endDateStr) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date beginDate = null;
+        Date endDate = null;
+        try {
+            beginDate = dateFormat.parse(beginDateStr);
+            endDate = dateFormat.parse(endDateStr);
+        } catch (ParseException e) {
+            logger.error("DatesRecognition", e);
+        }
+        long timeDifference = endDate.getTime() - beginDate.getTime();
+        return (int) (((timeDifference /1000) / 3600) / 24);
     }
 }

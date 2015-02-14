@@ -17,33 +17,29 @@ import java.sql.SQLException;
 public class AddPenaltyCommand extends CommandTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(AddPenaltyCommand.class);
-    
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-        request.getSession().removeAttribute("error");
         try {
+            request.getSession().removeAttribute("error");
             int orderId = Integer.parseInt(request.getParameter("id"));
             double penalty = Double.parseDouble(request.getParameter("penalty"));
-            Order orderChosen = null;
-            DaoOrder daoOrder = null;
-            try {
-                daoOrder = DaoFactory.getDaoOrder();
-                boolean isUpdated = daoOrder.changeOrderPenalty(orderId, penalty);
-                if (isUpdated) {
-                    orderChosen = daoOrder.getOrderDataByOrderId(orderId);
-                    request.getSession().setAttribute("order", orderChosen);
-                } else {
-                    request.getSession().setAttribute("error", "DATABASE_PROBLEM");
-                }
-            } catch (SQLException e) {
+            DaoOrder daoOrder = DaoFactory.getDaoOrder();
+            boolean isUpdated = daoOrder.changeOrderPenalty(orderId, penalty);
+            if (isUpdated) {
+                Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+                request.getSession().setAttribute("order", orderChosen);
+            } else {
                 request.getSession().setAttribute("error", "DATABASE_PROBLEM");
-                logger.error("DBError", e);
             }
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("error", "ORDER_BY_ID_REQUEST_FAILED");
             logger.warn("WrongAccessTry", e);
+        }  catch (SQLException e) {
+            request.getSession().setAttribute("error", "DATABASE_PROBLEM");
+            logger.error("DBError", e);
         }
-        
+
         dispatcherForward(request, response, request.getRequestDispatcher("/order" +".tiles") );
 
     }

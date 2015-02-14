@@ -8,7 +8,6 @@ import ua.sergiishapoval.carrental.dao.DaoOrder;
 import ua.sergiishapoval.carrental.model.Order;
 import ua.sergiishapoval.carrental.model.User;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;

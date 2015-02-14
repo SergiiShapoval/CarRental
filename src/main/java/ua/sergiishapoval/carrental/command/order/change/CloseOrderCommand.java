@@ -8,10 +8,8 @@ import ua.sergiishapoval.carrental.dao.DaoOrder;
 import ua.sergiishapoval.carrental.model.Order;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.sql.SQLException;
 
 /**
@@ -20,39 +18,30 @@ import java.sql.SQLException;
 public class CloseOrderCommand implements Command {
 
     private static final Logger logger = LoggerFactory.getLogger(CloseOrderCommand.class);
-    
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-        request.getSession().removeAttribute("error");
-
         try {
+            request.getSession().removeAttribute("error");
             int orderId = Integer.parseInt(request.getParameter("id"));
-            Order orderChosen = null;
-
-            DaoOrder daoOrder = null;
-            try {
-                daoOrder = DaoFactory.getDaoOrder();
-                boolean isUpdated = daoOrder.changeOrderStatus(orderId, "closed");
-                if (isUpdated) {
-                    orderChosen = daoOrder.getOrderDataByOrderId(orderId);
-                    request.getSession().setAttribute("order", orderChosen);
-                } else {
-                    request.getSession().setAttribute("error", "DATABASE_PROBLEM");
-                }
-            } catch (SQLException e) {
+            DaoOrder daoOrder = DaoFactory.getDaoOrder();
+            boolean isUpdated = daoOrder.changeOrderStatus(orderId, "closed");
+            if (isUpdated) {
+                Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+                request.getSession().setAttribute("order", orderChosen);
+            } else {
                 request.getSession().setAttribute("error", "DATABASE_PROBLEM");
-                logger.error("DBError", e);
             }
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/order" +".tiles");
+            requestDispatcher.forward(request, response);
+
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("error", "ORDER_BY_ID_REQUEST_FAILED");
             logger.warn("WrongAccessTry", e);
-        }
-        try {
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/order" +".tiles");
-            requestDispatcher.forward(request, response);
-        } catch (ServletException e) {
-            logger.error("Forward", e);
-        } catch (IOException e) {
+        } catch (SQLException e) {
+            request.getSession().setAttribute("error", "DATABASE_PROBLEM");
+            logger.error("DBError", e);
+        } catch (Exception e) {
             logger.error("Forward", e);
         }
     }

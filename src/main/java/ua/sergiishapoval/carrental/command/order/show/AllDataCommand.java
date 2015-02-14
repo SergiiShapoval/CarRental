@@ -21,14 +21,9 @@ public class AllDataCommand extends CommandTemplate {
     
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-
-        
-
         if (isAccessNotPermitted(request, response)) return;
-
         try {
             DaoOrder daoOrder = DaoFactory.getDaoOrder();
-
             String path = request.getServletPath();
             String status = null;
             switch (path){
@@ -49,10 +44,8 @@ public class AllDataCommand extends CommandTemplate {
                     status = "closed";
                     break;
             }
-
             List<Order> orders = daoOrder.getAllOrderData(status);
             request.getSession().setAttribute("orders", orders);
-
         } catch (SQLException e) {
             logger.error("DBError", e);
         }

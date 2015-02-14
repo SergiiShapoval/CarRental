@@ -65,7 +65,7 @@ public class DaoCar {
     }
 
 
-    public boolean checkCarAvailability(int carId, String beginDate, String endDate) throws SQLException {
+    public boolean isCarAvailable(int carId, String beginDate, String endDate) throws SQLException {
 /*if no car in request = car is available*/
         StringBuilder preparedStatementBuilder = new StringBuilder();
         preparedStatementBuilder.append(DATE_ORDER_FILTER);

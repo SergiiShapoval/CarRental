@@ -8,10 +8,8 @@ import ua.sergiishapoval.carrental.dao.DaoOrder;
 import ua.sergiishapoval.carrental.model.Order;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.sql.SQLException;
 
 /**
@@ -24,37 +22,25 @@ public class ShowOrderCommandTemplate extends CommandTemplate {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
         if (isAccessNotPermitted(request, response)) return;
-        RequestDispatcher requestDispatcher;
         try {
             int orderId = Integer.parseInt(request.getParameter("id"));
-            Order orderChosen = null;
-
-            DaoOrder daoOrder = null;
-            try {
-                daoOrder = DaoFactory.getDaoOrder();
-                orderChosen = daoOrder.getOrderDataByOrderId(orderId);
-/*handle request on not existing orders start*/
-                if (orderChosen.getBrand() == null) {
-                    infoRedirect(request, response, "ORDER_BY_ID_REQUEST_FAILED" );
-/*handle request on not existing orders end*/
-                } else {
-                    request.getSession().setAttribute("order", orderChosen);
-                    requestDispatcher = request.getRequestDispatcher("/order" + ".tiles");
-                    try {
-                        requestDispatcher.forward(request, response);
-                    } catch (ServletException e) {
-                        logger.error("Forward", e);
-                    } catch (IOException e) {
-                        logger.error("Forward", e);
-                    }
-                }
-            } catch (SQLException e) {
-                infoRedirect(request, response, "DATABASE_PROBLEM" );
-                logger.error("DBError", e);
+            DaoOrder daoOrder = DaoFactory.getDaoOrder();
+            Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+            if (orderChosen.getBrand() == null) {
+                infoRedirect(request, response, "ORDER_BY_ID_REQUEST_FAILED" );
+            } else {
+                request.getSession().setAttribute("order", orderChosen);
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("/order" + ".tiles");
+                requestDispatcher.forward(request, response);
             }
         } catch (NumberFormatException e) {
             infoRedirect(request, response, "ORDER_BY_ID_REQUEST_FAILED" );
             logger.warn("WrongAccessTry", e);
+        } catch (SQLException e) {
+            infoRedirect(request, response, "DATABASE_PROBLEM" );
+            logger.error("DBError", e);
+        } catch (Exception e) {
+            logger.error("Forward", e);
         }
     }
 
