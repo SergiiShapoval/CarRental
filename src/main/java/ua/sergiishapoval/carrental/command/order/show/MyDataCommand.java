@@ -49,7 +49,7 @@ public class MyDataCommand extends CommandTemplate {
                     status = "closed";
                     break;
             }
-            List<Order> orders = daoOrder.getOrderDataByUserIdAndStatus(user.getUserId(), status);
+            List<Order> orders = daoOrder.getByUserIdAndStatus(user.getUserId(), status);
             request.getSession().setAttribute("orders", orders);
         } catch (SQLException e) {
             logger.error("DBError", e);

@@ -25,9 +25,9 @@ public class AddPenaltyCommand extends CommandTemplate {
             int orderId = Integer.parseInt(request.getParameter("id"));
             double penalty = Double.parseDouble(request.getParameter("penalty"));
             DaoOrder daoOrder = DaoFactory.getDaoOrder();
-            boolean isUpdated = daoOrder.changeOrderPenalty(orderId, penalty);
+            boolean isUpdated = daoOrder.changePenalty(orderId, penalty);
             if (isUpdated) {
-                Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+                Order orderChosen = daoOrder.getDataById(orderId);
                 request.getSession().setAttribute("order", orderChosen);
             } else {
                 request.getSession().setAttribute("error", "DATABASE_PROBLEM");

@@ -25,7 +25,7 @@ public class UserInfoCommand extends CommandTemplate {
         try {
             int userId = Integer.parseInt(request.getParameter("id"));
             DaoUser daoUser = DaoFactory.getDaoUser();
-            User userChosen = daoUser.findUserById(userId);
+            User userChosen = daoUser.findById(userId);
 /*handle request on not existing users start*/
             if (userChosen.getEmail() == null) {
                 infoRedirect(request, response, "USER_BY_ID_REQUEST_FAILED" );

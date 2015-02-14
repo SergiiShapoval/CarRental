@@ -54,7 +54,7 @@ public class DaoCar {
         this.connection = connection;
     }
 
-    public void reserveCar(int userId, Car car, String beginDate, String endDate, int dayQty) throws SQLException {
+    public void reserve(int userId, Car car, String beginDate, String endDate, int dayQty) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(RESERVE_REQUEST);
         preparedStatement.setInt(1, car.getId());
         preparedStatement.setInt(2, userId);
@@ -65,7 +65,7 @@ public class DaoCar {
     }
 
 
-    public boolean isCarAvailable(int carId, String beginDate, String endDate) throws SQLException {
+    public boolean isAvailable(int carId, String beginDate, String endDate) throws SQLException {
 /*if no car in request = car is available*/
         StringBuilder preparedStatementBuilder = new StringBuilder();
         preparedStatementBuilder.append(DATE_ORDER_FILTER);
@@ -84,7 +84,7 @@ public class DaoCar {
         return !resultSet.next();
     }
 
-    public List<Car> getFilteredCarsPage(int pageNumber, int pageLimit, CarFilter carFilter) throws SQLException {
+    public List<Car> getFilteredPage(int pageNumber, int pageLimit, CarFilter carFilter) throws SQLException {
         List<Car> cars = new ArrayList<>();
         StringBuilder preparedStatementBuilder = new StringBuilder();
         DateFilterStatus dateFilterStatus = createFilterCriteria(carFilter, preparedStatementBuilder);

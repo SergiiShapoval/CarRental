@@ -43,7 +43,7 @@ public class SearchCarCommand extends CommandTemplate {
 
     private void createCarPage(HttpServletRequest request, Integer pageNumber, CarFilter carFilter) throws SQLException {
         DaoCar daoCar = DaoFactory.getDaoCar();
-        List<Car> cars = daoCar.getFilteredCarsPage(pageNumber, PAGE_LIMIT, carFilter);
+        List<Car> cars = daoCar.getFilteredPage(pageNumber, PAGE_LIMIT, carFilter);
         Integer carCount = carFilter.getResultQty();
 
         int totalPages = carCount/PAGE_LIMIT + 1;

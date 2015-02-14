@@ -26,9 +26,9 @@ public class RejectOrderCommand implements Command {
             int orderId = Integer.parseInt(request.getParameter("id"));
             String reason =request.getParameter("reason");
             DaoOrder daoOrder = DaoFactory.getDaoOrder();
-            boolean isUpdated = daoOrder.changeOrderReason(orderId, reason);
+            boolean isUpdated = daoOrder.changeReason(orderId, reason);
             if (isUpdated) {
-                Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+                Order orderChosen = daoOrder.getDataById(orderId);
                 request.getSession().setAttribute("order", orderChosen);
             } else {
                 request.getSession().setAttribute("error", "DATABASE_PROBLEM");

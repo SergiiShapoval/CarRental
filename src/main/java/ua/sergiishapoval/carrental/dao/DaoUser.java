@@ -26,7 +26,7 @@ public class DaoUser {
         this.connection = connection;
     }
 
-    public void insertUser(User user) throws SQLException {
+    public void add(User user) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER);
         preparedStatement.setString(1, user.getFirstname());
         preparedStatement.setString(2, user.getLastname());
@@ -38,46 +38,46 @@ public class DaoUser {
     }
     
     
-    public boolean findUserByEmail(User user) throws SQLException {
+    public boolean findByEmail(User user) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_EMAIL);
         preparedStatement.setString(1, user.getEmail());
 
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet.next() ){
-            setUserProps(user, resultSet);
+            setProps(user, resultSet);
             return true;
         }
 
         return false;
     }
-    public User findUserById(int userId) throws SQLException {
+    public User findById(int userId) throws SQLException {
         User user = new User();
         PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_ID);
         preparedStatement.setInt(1, userId);
 
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet.next()) {
-            setUserProps(user, resultSet);
+            setProps(user, resultSet);
         }
 
         return user;
     }
 
-    public boolean findUserByEmailAndPassword(User user) throws SQLException {
+    public boolean findByEmailAndPassword(User user) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_WHERE_EMAIL_AND_PASSWORD);
         preparedStatement.setString(1, user.getEmail());
         preparedStatement.setString(2, user.getPassword());
 
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet.next() ){
-            setUserProps(user, resultSet);
+            setProps(user, resultSet);
             return true;
         }
 
         return false;
     }
 
-    private void setUserProps(User user, ResultSet resultSet) throws SQLException {
+    private void setProps(User user, ResultSet resultSet) throws SQLException {
         user.setFirstname(resultSet.getString("firstname"));
         user.setLastname(resultSet.getString("lastname"));
         user.setPassport(resultSet.getString("passport"));

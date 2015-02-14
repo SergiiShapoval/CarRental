@@ -25,7 +25,7 @@ public class ShowOrderCommandTemplate extends CommandTemplate {
         try {
             int orderId = Integer.parseInt(request.getParameter("id"));
             DaoOrder daoOrder = DaoFactory.getDaoOrder();
-            Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+            Order orderChosen = daoOrder.getDataById(orderId);
             if (orderChosen.getBrand() == null) {
                 infoRedirect(request, response, "ORDER_BY_ID_REQUEST_FAILED" );
             } else {

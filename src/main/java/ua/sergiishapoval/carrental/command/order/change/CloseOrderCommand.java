@@ -25,9 +25,9 @@ public class CloseOrderCommand implements Command {
             request.getSession().removeAttribute("error");
             int orderId = Integer.parseInt(request.getParameter("id"));
             DaoOrder daoOrder = DaoFactory.getDaoOrder();
-            boolean isUpdated = daoOrder.changeOrderStatus(orderId, "closed");
+            boolean isUpdated = daoOrder.changeStatus(orderId, "closed");
             if (isUpdated) {
-                Order orderChosen = daoOrder.getOrderDataByOrderId(orderId);
+                Order orderChosen = daoOrder.getDataById(orderId);
                 request.getSession().setAttribute("order", orderChosen);
             } else {
                 request.getSession().setAttribute("error", "DATABASE_PROBLEM");

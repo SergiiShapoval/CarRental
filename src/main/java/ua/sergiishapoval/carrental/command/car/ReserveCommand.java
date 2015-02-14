@@ -45,11 +45,11 @@ public class ReserveCommand extends CommandTemplate {
 
         try {
             DaoCar daoCar = DaoFactory.getDaoCar();
-            if (!daoCar.isCarAvailable(car.getId(), beginDateStr, endDateStr)) {
+            if (!daoCar.isAvailable(car.getId(), beginDateStr, endDateStr)) {
                 request.getSession().setAttribute("error", "CAR_NOT_AVAILABLE");
                 dispatcherForward(request, response, request.getRequestDispatcher("/reserve" +".tiles"));
             } else {
-                daoCar.reserveCar(user.getUserId(), car, beginDateStr, endDateStr, dayDifference );
+                daoCar.reserve(user.getUserId(), car, beginDateStr, endDateStr, dayDifference);
                 infoRedirect(request, response, "RESERVE_SUCCESS" );
             }
         } catch (SQLException e) {

@@ -44,7 +44,7 @@ public class AllDataCommand extends CommandTemplate {
                     status = "closed";
                     break;
             }
-            List<Order> orders = daoOrder.getAllOrderData(status);
+            List<Order> orders = daoOrder.getAllData(status);
             request.getSession().setAttribute("orders", orders);
         } catch (SQLException e) {
             logger.error("DBError", e);

@@ -40,7 +40,7 @@ public class RegistrationCommand extends CommandTemplate {
         if (isUserValid(user, userErrors)) {
             try {
                 DaoUser daoUser = DaoFactory.getDaoUser();
-                daoUser.insertUser(user);
+                daoUser.add(user);
                 return true;
             } catch (SQLException e) {
                 userErrors.setEmail("DOUBLE_EMAIL");

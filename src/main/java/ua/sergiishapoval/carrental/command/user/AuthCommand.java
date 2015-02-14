@@ -67,9 +67,9 @@ public class AuthCommand extends CommandTemplate {
         if (isCredentialsWellFormed(user)){
             try {
                 DaoUser daoUser = DaoFactory.getDaoUser();
-                isAnyError = !daoUser.findUserByEmailAndPassword(user);
+                isAnyError = !daoUser.findByEmailAndPassword(user);
                 if (isAnyError) {
-                    boolean isRegistered = daoUser.findUserByEmail(user);
+                    boolean isRegistered = daoUser.findByEmail(user);
                     if (isRegistered){
                         userErrors.setPassword("WRONG_PASSWORD");
                     } else {

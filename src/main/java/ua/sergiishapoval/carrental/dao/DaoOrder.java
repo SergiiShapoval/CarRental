@@ -34,7 +34,7 @@ public class DaoOrder {
     final static String UPDATE_ORDER_PENALTY = sqlResourceBundle.getString("UPDATE_ORDER_PENALTY");
 
 
-    public boolean changeOrderPenalty(int orderId, double penalty) throws SQLException {
+    public boolean changePenalty(int orderId, double penalty) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_ORDER_PENALTY);
 
         preparedStatement.setDouble(1, penalty);
@@ -42,7 +42,7 @@ public class DaoOrder {
         return preparedStatement.executeUpdate() == 1;
     }
 
-    public boolean changeOrderReason(int orderId, String reason) throws SQLException {
+    public boolean changeReason(int orderId, String reason) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_ORDER_REASON);
 
         preparedStatement.setString(1, reason);
@@ -51,7 +51,7 @@ public class DaoOrder {
     }
 
 
-    public boolean changeOrderStatus(int orderId, String status) throws SQLException {
+    public boolean changeStatus(int orderId, String status) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_ORDER_STATUS);
 
         preparedStatement.setString(1, status);
@@ -59,7 +59,7 @@ public class DaoOrder {
         return preparedStatement.executeUpdate() ==1;
     }
 
-    public Order getOrderDataByOrderId(int orderId) throws SQLException {
+    public Order getDataById(int orderId) throws SQLException {
         Order order = new Order();
 
         PreparedStatement preparedStatement = connection.prepareStatement(ORDERS_REQUESTS_SELECT_BY_ID);
@@ -67,13 +67,13 @@ public class DaoOrder {
 
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet.next() ){
-            order = setOrderProps(resultSet);
+            order = setProps(resultSet);
         }
 
         return order;
     }
 
-    public List<Order> getOrderDataByUserIdAndStatus(int userId, String status) throws SQLException {
+    public List<Order> getByUserIdAndStatus(int userId, String status) throws SQLException {
         List<Order> orders = new ArrayList<>();
 
         PreparedStatement preparedStatement = connection.prepareStatement(MY_ORDERS_REQUESTS_SELECT);
@@ -82,14 +82,14 @@ public class DaoOrder {
 
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next() ){
-            Order order = setOrderProps(resultSet);
+            Order order = setProps(resultSet);
             orders.add(order);
         }
         
         return orders;
     }
 
-    public List<Order> getAllOrderData(String status) throws SQLException {
+    public List<Order> getAllData(String status) throws SQLException {
         List<Order> orders = new ArrayList<>();
 
         PreparedStatement preparedStatement = connection.prepareStatement(ALL_ORDERS_REQUESTS_SELECT);
@@ -97,7 +97,7 @@ public class DaoOrder {
 
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next() ){
-            Order order = setOrderProps(resultSet);
+            Order order = setProps(resultSet);
             orders.add(order);
         }
         
@@ -105,7 +105,7 @@ public class DaoOrder {
     }
 
 
-    private Order setOrderProps(ResultSet resultSet) throws SQLException {
+    private Order setProps(ResultSet resultSet) throws SQLException {
         Order order = new Order();
 
         order.setBrand(resultSet.getString("brand_name"));

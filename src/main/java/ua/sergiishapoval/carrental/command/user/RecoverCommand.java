@@ -119,7 +119,7 @@ public class RecoverCommand extends CommandTemplate {
         if (!isAnyError) {
             try {
                 DaoUser daoUser = DaoFactory.getDaoUser();
-                if (!daoUser.findUserByEmail(user)){
+                if (!daoUser.findByEmail(user)){
                     isAnyError = true;
                     userErrors.setEmail("NO_USER_FOR_EMAIL");
                 }
