@@ -24,15 +24,12 @@ public class MyDataCommand extends CommandTemplate {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
         User user = (User) request.getSession().getAttribute("user");
-        RequestDispatcher requestDispatcher = null;
         if (user == null ) {
             infoRedirect(request, response, "LOG_IN_WARN");
             return;
         }
-
-        DaoOrder daoOrder = null;
         try {
-            daoOrder = DaoFactory.getDaoOrder();
+            DaoOrder daoOrder = DaoFactory.getDaoOrder();
             String path = request.getServletPath();
             String status = null;
             switch (path){
@@ -53,7 +50,7 @@ public class MyDataCommand extends CommandTemplate {
                     status = "closed";
                     break;
             }
-            List<Order> orders = daoOrder.getOrderDataByUserIdAndStatus(user.getUser_id(), status);
+            List<Order> orders = daoOrder.getOrderDataByUserIdAndStatus(user.getUserId(), status);
             request.getSession().setAttribute("orders", orders);
         } catch (SQLException e) {
             logger.error("DBError", e);

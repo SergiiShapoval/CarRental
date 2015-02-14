@@ -83,7 +83,7 @@ public class ReserveCommand extends CommandTemplate {
                         error = "CAR_NOT_AVAILABLE";
                     } else {
 /*car reservation start*/
-                        daoCar.reserveCar(user.getUser_id(), car, beginDateStr, endDateStr, dayDifference );
+                        daoCar.reserveCar(user.getUserId(), car, beginDateStr, endDateStr, dayDifference );
 /*car reservation end*/
                     }
                 } catch (SQLException e) {

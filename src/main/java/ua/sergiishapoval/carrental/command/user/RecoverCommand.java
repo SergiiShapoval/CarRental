@@ -24,46 +24,101 @@ import java.util.*;
 public class RecoverCommand extends CommandTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(RecoverCommand.class);
-    
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-        Locale locale = Locale.getDefault();
-
-        ResourceBundle resourceBundle = null;
-        try {
-            resourceBundle = ResourceBundle.getBundle("language");
-        } catch (MissingResourceException e) {
-            resourceBundle = ResourceBundle.getBundle("language", Locale.ENGLISH);
-            logger.info("ResourceBundleMissing", e);
-        }
-
+        ResourceBundle resourceBundle = getCorrectResourceBundle();
         User user = getUserFromParameters(request);
-
         request.getSession().removeAttribute("userError");
         UserErrors userErrors = new UserErrors();
-        boolean isAnyError = false;
-        
-/*verifying form start*/
-        if (!user.getEmail().matches("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@" +
-                "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")){
-            isAnyError = true;
-            userErrors.setEmail("WRONG_EMAIL");
+        boolean isAnyError = verifyRecoverFormParams(user, userErrors);
+        isAnyError = getPersistedUserDetails(user, userErrors, isAnyError);
+        if (isAnyError) {
+            request.setAttribute("userError", userErrors);
+            dispatcherForward(request, response, request.getRequestDispatcher("/recover.tiles"));
+        } else {
+            request.setAttribute("info", "RECOVER_EMAIL_SENT");
+            prepareAndSendEmail(request, resourceBundle, user);
+            dispatcherForward(request, response, request.getRequestDispatcher("/info.tiles"));
         }
-        if (user.getEmail().length() >= 55){
-            isAnyError = true;
-            userErrors.setEmail("BAD_LENGTH");
-        }
-/*verifying form end*/
+    }
 
-/*receiving details on user from DB start*/
+    private void prepareAndSendEmail(HttpServletRequest request, ResourceBundle resourceBundle, User user) {
+        Properties props = getEmailProperties(request);
+        Session session = getEmailSession(props, props.getProperty("userLogin"), props.getProperty("userPassword"));
+        try {
+            MimeMessage message = setMimeMessage(resourceBundle, props, session);
+            String htmlBody = getHtmlTemplate(request);
+            htmlBody = presonalizeMessage(resourceBundle, user, htmlBody);
+            setHtmlContent(user, message, htmlBody);
+            Transport.send(message);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("WrongEncoding", e);
+        } catch (IOException e) {
+            logger.error("MailFileReading", e);
+        } catch (MessagingException e) {
+            logger.error("MailSendingError", e);
+        }
+    }
+
+    private void setHtmlContent(User user, MimeMessage message, String htmlBody) throws MessagingException {
+        message.setContent(htmlBody, "text/html; charset=UTF-8");
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
+        message.setSentDate(new Date());
+    }
+
+    private String presonalizeMessage(ResourceBundle resourceBundle, User user, String htmlBody) {
+        htmlBody = htmlBody.replaceAll("\\$\\{firstname\\}", user.getFirstname());
+        htmlBody = htmlBody.replaceAll("\\$\\{RECOVER_EMAIL_TITLE\\}", resourceBundle.getString("RECOVER_EMAIL_TITLE"));
+        htmlBody = htmlBody.replaceAll("\\$\\{GREETING\\}", resourceBundle.getString("GREETING"));
+        htmlBody = htmlBody.replaceAll("\\$\\{RECOVERY_EMAIL_MESSAGE\\}", resourceBundle.getString("RECOVERY_EMAIL_MESSAGE"));
+        htmlBody = htmlBody.replaceAll("\\$\\{password\\}", user.getPassword());
+        htmlBody = htmlBody.replaceAll("\\$\\{subject\\}", resourceBundle.getString("RECOVER_EMAIL_TITLE"));
+        return htmlBody;
+    }
+
+    private String getHtmlTemplate(HttpServletRequest request) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(
+                request.getSession().getServletContext().getRealPath("WEB-INF/mail/recover.html")));
+        StringBuilder stringBuilder = new StringBuilder();
+        while (reader.ready()){
+            stringBuilder.append(reader.readLine());
+        }
+        return stringBuilder.toString();
+    }
+
+    private MimeMessage setMimeMessage(ResourceBundle resourceBundle, Properties props, Session session) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = new MimeMessage(session);
+        message.setHeader("Content-Type", "text/html; charset=UTF-8");
+        message.setFrom(new InternetAddress(props.getProperty("userFrom")));
+        message.setSubject(MimeUtility.encodeText(resourceBundle.getString("RECOVER_EMAIL_TITLE"), "UTF-8", "Q"));
+        return message;
+    }
+
+    private Session getEmailSession(Properties props, final String userLogin, final String userPassword) {
+        return Session.getInstance(props,
+                new Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(userLogin, userPassword);
+                    }
+                });
+    }
+
+    private Properties getEmailProperties(HttpServletRequest request) {
+        Properties props = new Properties();
+        String mailPropsPath = request.getSession().getServletContext().getRealPath("WEB-INF/classes/mail.properties");
+        try {
+            props.load(new FileReader(mailPropsPath));
+        } catch (IOException e) {
+            logger.error("MailPropsPath", e);
+        }
+        return props;
+    }
+
+    private boolean getPersistedUserDetails(User user, UserErrors userErrors, boolean isAnyError) {
         if (!isAnyError) {
-            DaoUser daoUser = null;
             try {
-                daoUser = DaoFactory.getDaoUser();
-            } catch (SQLException e) {
-                logger.error("DBError", e);
-            }
-            try {
+                DaoUser daoUser = DaoFactory.getDaoUser();
                 if (!daoUser.findUserByEmail(user)){
                     isAnyError = true;
                     userErrors.setEmail("NO_USER_FOR_EMAIL");
@@ -73,74 +128,29 @@ public class RecoverCommand extends CommandTemplate {
                 userErrors.setEmail("NO_USER_FOR_EMAIL");
             }
         }
-/*receiving details on user from DB end*/
-        if (isAnyError) {
-            request.setAttribute("userError", userErrors);
-            dispatcherForward(request, response, request.getRequestDispatcher("/recover.tiles"));
-        } else {
-            request.setAttribute("info", "RECOVER_EMAIL_SENT");
-//receiving emailing properties begin
-            Properties props = new Properties();
-            String mailPropsPath = request.getSession().getServletContext().getRealPath("WEB-INF/classes/mail.properties");
-            try {
-                props.load(new FileReader(mailPropsPath));
-            } catch (IOException e) {
-                logger.error("MailPropsPath", e);
-            }
-            String userLogin = props.getProperty("userLogin");
-            String userPassword = props.getProperty("userPassword");
-//receiving emailing properties end
-            
-//            emailing session
-            Session session = Session.getInstance(props,
-                    new javax.mail.Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(userLogin, userPassword);
-                        }
-                    });
-//preparing email content
-            try {
-                MimeMessage message = new MimeMessage(session);
-                message.setHeader("Content-Type", "text/html; charset=UTF-8");
-                message.setFrom(new InternetAddress(props.getProperty("userFrom")));
-                try {
-                    message.setSubject(MimeUtility.encodeText(resourceBundle.getString("RECOVER_EMAIL_TITLE"),  "UTF-8", "Q"));
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("WrongEncoding", e);
-                }
-                
-                String htmlBody = null;
+        return isAnyError;
+    }
 
-//receiving prepared email template
-                try {
-                    BufferedReader reader = new BufferedReader(new FileReader(
-                            request.getSession().getServletContext().getRealPath("WEB-INF/mail/recover.html")));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    while (reader.ready()){
-                        stringBuilder.append(reader.readLine());
-                    }
-                    htmlBody = stringBuilder.toString();
-                } catch (IOException e) {
-                    logger.error("MailFileReading", e);
-                }
-//changing variables in the letter
-                htmlBody = htmlBody.replaceAll("\\$\\{firstname\\}", user.getFirstname());
-                htmlBody = htmlBody.replaceAll("\\$\\{RECOVER_EMAIL_TITLE\\}", resourceBundle.getString("RECOVER_EMAIL_TITLE"));
-                htmlBody = htmlBody.replaceAll("\\$\\{GREETING\\}", resourceBundle.getString("GREETING"));
-                htmlBody = htmlBody.replaceAll("\\$\\{RECOVERY_EMAIL_MESSAGE\\}", resourceBundle.getString("RECOVERY_EMAIL_MESSAGE"));
-                htmlBody = htmlBody.replaceAll("\\$\\{password\\}", user.getPassword());
-                htmlBody = htmlBody.replaceAll("\\$\\{subject\\}", resourceBundle.getString("RECOVER_EMAIL_TITLE"));
+    private boolean verifyRecoverFormParams(User user, UserErrors userErrors) {
+        boolean isAnyError = false;
+        if (!user.getEmail().matches("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@" +
+                "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")){
+            isAnyError = true;
+            userErrors.setEmail("WRONG_EMAIL");
+        }
+        if (user.getEmail().length() >= 55){
+            isAnyError = true;
+            userErrors.setEmail("BAD_LENGTH");
+        }
+        return isAnyError;
+    }
 
-                message.setContent(htmlBody, "text/html; charset=UTF-8");
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
-                message.setSentDate(new Date());
-                Transport.send(message);
-            } catch (MessagingException e) {
-                logger.error("MailSendingError", e);
-            }
-
-            dispatcherForward(request, response, request.getRequestDispatcher("/info.tiles"));
-
+    private ResourceBundle getCorrectResourceBundle() {
+        try {
+            return ResourceBundle.getBundle("language");
+        } catch (MissingResourceException e) {
+            logger.info("ResourceBundleMissing", e);
+            return ResourceBundle.getBundle("language", Locale.ENGLISH);
         }
     }
 }

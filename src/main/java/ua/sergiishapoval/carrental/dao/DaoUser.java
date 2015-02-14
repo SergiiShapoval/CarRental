@@ -33,7 +33,6 @@ public class DaoUser {
         preparedStatement.setString(3, user.getEmail());
         preparedStatement.setString(4, user.getPassport());
         preparedStatement.setString(5, user.getPassword());
-        String isAdmin =  new Boolean(user.getIsAdmin()).toString();
         preparedStatement.setBoolean(6, user.getIsAdmin());
         preparedStatement.executeUpdate();
     }
@@ -84,7 +83,7 @@ public class DaoUser {
         user.setPassport(resultSet.getString("passport"));
         user.setPassword(resultSet.getString("password"));
         user.setEmail(resultSet.getString("email"));
-        user.setUser_id(resultSet.getInt("user_id"));
+        user.setUserId(resultSet.getInt("user_id"));
         user.setIsAdmin(resultSet.getBoolean("is_admin"));
     }
 

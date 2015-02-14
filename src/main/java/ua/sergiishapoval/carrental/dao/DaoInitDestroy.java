@@ -17,7 +17,6 @@ public class DaoInitDestroy {
         this.connection = connection;
     }
 
-
     public void initDB() throws SQLException {
             Statement statement = connection.createStatement();
             statement.executeUpdate(resourceBundle.getString("CLASSES_CREATE"));

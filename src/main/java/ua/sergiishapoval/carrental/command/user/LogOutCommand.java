@@ -19,7 +19,6 @@ public class LogOutCommand implements Command {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();
-
         try {
             response.sendRedirect("/index");
         } catch (IOException e) {

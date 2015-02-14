@@ -31,9 +31,8 @@ public class MainServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        DaoInitDestroy daoInitDestroy = null;
         try {
-            daoInitDestroy = DaoFactory.getDaoInitDestroy();
+            DaoInitDestroy daoInitDestroy = DaoFactory.getDaoInitDestroy();
             daoInitDestroy.initDB();
         } catch (SQLException e) {
             logger.error("DBError", e);
@@ -46,15 +45,31 @@ public class MainServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /*clearing invalid user in session begin*/
-        if (request.getSession().getAttribute("userError") != null) {
-            request.getSession().removeAttribute("user");
-            request.getSession().removeAttribute("auth");
-            request.getSession().removeAttribute("userError");
+        clearSessionInvalidUser(request);
+        setLocale(request);
+        autorizeByCookies(request);
+        Command command = CommandFactory.createCommand(request);
+        command.execute(request, response);
+    }
+
+    private void autorizeByCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies!= null && cookies.length > 1) {
+            Map<String, String> userMap = new HashMap<>();
+            for (Cookie cookie : cookies) {
+                userMap.put(cookie.getName(), cookie.getValue());
+            }
+            User user = new User();
+            try {
+                BeanUtils.populate(user, userMap);
+            } catch (ReflectiveOperationException e) {
+                logger.error("BeanUtilsError", e);
+            }
+            request.getSession().setAttribute("user", user);
         }
-        /*clearing invalid user in session end*/
-        
-        /*set Locale start*/
+    }
+
+    private void setLocale(HttpServletRequest request) {
         if (request.getSession().getAttribute("lang_id") == null){
             String language = request.getLocale().getLanguage();
             switch (language.toLowerCase()){
@@ -65,44 +80,23 @@ public class MainServlet extends HttpServlet {
             Locale locale = new Locale(language);
             Locale.setDefault(locale);
         }
-        /*set Locale end*/
-        
-        
-        /*Authorize through cookie start*/
-        Cookie[] cookies = request.getCookies();
-        if (cookies!= null && cookies.length > 1) {
-            Map<String, String> userMap = new HashMap<>();
+    }
 
-            for (Cookie cookie : cookies) {
-                userMap.put(cookie.getName(), cookie.getValue());
-            }
-
-            User user = new User();
-
-            try {
-                BeanUtils.populate(user, userMap);
-            } catch (IllegalAccessException e) {
-                logger.error("BeanUtilsError", e);
-            } catch (InvocationTargetException e) {
-                logger.error("BeanUtilsError", e);
-            }
-            request.getSession().setAttribute("user", user);
+    private void clearSessionInvalidUser(HttpServletRequest request) {
+        if (request.getSession().getAttribute("userError") != null) {
+            request.getSession().removeAttribute("user");
+            request.getSession().removeAttribute("auth");
+            request.getSession().removeAttribute("userError");
         }
-        /*Authorize through cookie end*/
-
-        Command command = CommandFactory.createCommand(request);
-        command.execute(request, response);
     }
 
     @Override
     public void destroy() {
-        DaoInitDestroy daoInitDestroy = null;
         try {
-            daoInitDestroy = DaoFactory.getDaoInitDestroy();
+            DaoInitDestroy daoInitDestroy = DaoFactory.getDaoInitDestroy();
             daoInitDestroy.destroyDB();
         } catch (SQLException e) {
             logger.error("DBError", e);
-
         }
     }
 }

@@ -5,7 +5,7 @@ package ua.sergiishapoval.carrental.model;
  */
 public class User {
     
-    private Integer user_id;
+    private Integer userId;
     private String firstname;
     private String lastname;
     private String email;
@@ -17,12 +17,12 @@ public class User {
     public User() {
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int user_id) {
+        this.userId = user_id;
     }
 
     public String getFirstname() {

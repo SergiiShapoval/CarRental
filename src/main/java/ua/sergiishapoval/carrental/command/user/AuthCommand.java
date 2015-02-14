@@ -14,7 +14,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -29,33 +28,45 @@ public class AuthCommand extends CommandTemplate {
     public void execute(HttpServletRequest request, HttpServletResponse response) {
 
         User user = getUserFromParameters(request);
-/*clean previous attributes start*/
-        request.getSession().removeAttribute("userError");
-        request.getSession().removeAttribute("auth");
+        cleanSession(request);
         UserErrors userErrors = new UserErrors();
-        boolean isAnyError = false;
-/*clean previous attributes start*/
-
-/*handle path for apache tiles start, page doesn't changed during log in*/
-        String[] path = request.getServletPath().split("/");
-        RequestDispatcher requestDispatcher = null;
-        if (path.length >= 2) {
-            requestDispatcher = request.getRequestDispatcher("/" + path[1] + ".tiles");
+        RequestDispatcher requestDispatcher = getSamePageDispatcher(request);
+        boolean isAnyError = verifyUserParams(request, user, userErrors);
+        if (isAnyError){
+            request.getSession().setAttribute("userError", userErrors);
+            request.getSession().setAttribute("auth", true);
         } else {
-            requestDispatcher = request.getRequestDispatcher("/" + "index" + ".tiles");
+            addAuthCookies(request, response, user);
         }
-/*handle path for apache tiles start*/
-/*verify user params start*/
-        if (user.getEmail()!=null && user.getPassword()!= null &&
-                !user.getEmail().equals("") && !user.getPassword().equals("")){
-            DaoUser daoUser = null;
+        dispatcherForward(request, response, requestDispatcher);
+
+    }
+
+    private void addAuthCookies(HttpServletRequest request, HttpServletResponse response, User user) {
+        String cookieOn = request.getParameter("cookieOn");
+        if (cookieOn != null && cookieOn.equals("on")){
+            Map<String, String> userMap = null;
             try {
-                daoUser = DaoFactory.getDaoUser();
-            } catch (SQLException e) {
-                logger.error("DBError", e);
+                userMap = BeanUtils.describe(user);
+            } catch (Exception e) {
+                logger.error("BeanUtilsError", e);
             }
 
+            for (String key: userMap.keySet()){
+                Cookie cookie = new Cookie(key, userMap.get(key));
+                cookie.setMaxAge(604800);
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+            }
+        }
+    }
+
+    private boolean verifyUserParams(HttpServletRequest request, User user, UserErrors userErrors) {
+        boolean isAnyError = false;
+        if (isCredentialsWellFormed(user)){
             try {
+                DaoUser daoUser = DaoFactory.getDaoUser();
                 isAnyError = !daoUser.findUserByEmailAndPassword(user);
                 if (isAnyError) {
                     boolean isRegistered = daoUser.findUserByEmail(user);
@@ -73,39 +84,17 @@ public class AuthCommand extends CommandTemplate {
             isAnyError = true;
             userErrors.setEmail("BLANK_FIELDS");
         }
-/*verify user params end*/
-
         request.getSession().setAttribute("user", user);
+        return isAnyError;
+    }
 
-        if (isAnyError){
-            request.getSession().setAttribute("userError", userErrors);
-            request.getSession().setAttribute("auth", true);
-        } else {
-/*logic for cookies start*/
-            String cookieOn = request.getParameter("cookieOn");
-            if (cookieOn != null && cookieOn.equals("on")){
+    private boolean isCredentialsWellFormed(User user) {
+        return user.getEmail() != null && user.getPassword()!= null &&
+                !user.getEmail().equals("") && !user.getPassword().equals("");
+    }
 
-                Map<String, String> userMap = null;
-                try {
-                    userMap = BeanUtils.describe(user);
-                } catch (IllegalAccessException e) {
-                    logger.error("BeanUtilsError", e);
-                } catch (InvocationTargetException e) {
-                    logger.error("BeanUtilsError", e);
-                } catch (NoSuchMethodException e) {
-                    logger.error("BeanUtilsError", e);
-                }
-                for (String key:userMap.keySet()){
-                    Cookie cookie = new Cookie(key, userMap.get(key));
-                    cookie.setMaxAge(604800);
-                    cookie.setPath("/");
-                    cookie.setHttpOnly(true);
-                    response.addCookie(cookie);
-                }
-            }
-        }
-/*logic for cookies end*/
-        dispatcherForward(request, response, requestDispatcher);
-
+    private void cleanSession(HttpServletRequest request) {
+        request.getSession().removeAttribute("userError");
+        request.getSession().removeAttribute("auth");
     }
 }

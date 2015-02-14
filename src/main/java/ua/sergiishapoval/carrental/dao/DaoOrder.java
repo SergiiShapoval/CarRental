@@ -39,11 +39,7 @@ public class DaoOrder {
 
         preparedStatement.setDouble(1, penalty);
         preparedStatement.setInt(2, orderId);
-        int result = preparedStatement.executeUpdate();
-        if (result == 1)
-            return true;
-        else
-            return false;
+        return preparedStatement.executeUpdate() == 1;
     }
 
     public boolean changeOrderReason(int orderId, String reason) throws SQLException {
@@ -51,11 +47,7 @@ public class DaoOrder {
 
         preparedStatement.setString(1, reason);
         preparedStatement.setInt(2, orderId);
-        int result = preparedStatement.executeUpdate();
-        if (result == 1)
-            return true;
-        else
-            return false;
+        return preparedStatement.executeUpdate() ==1;
     }
 
 
@@ -64,16 +56,11 @@ public class DaoOrder {
 
         preparedStatement.setString(1, status);
         preparedStatement.setInt(2, orderId);
-        int result = preparedStatement.executeUpdate();
-        if (result == 1) 
-            return true;
-        else 
-            return false;
+        return preparedStatement.executeUpdate() ==1;
     }
 
     public Order getOrderDataByOrderId(int orderId) throws SQLException {
         Order order = new Order();
-
 
         PreparedStatement preparedStatement = connection.prepareStatement(ORDERS_REQUESTS_SELECT_BY_ID);
         preparedStatement.setInt(1, orderId);

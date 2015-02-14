@@ -24,7 +24,7 @@ public class CommandTemplate implements Command {
     public void execute(HttpServletRequest request, HttpServletResponse response) {
         infoRedirect(request, response, "BAD_COMMAND" );
     }
-    
+
     public void infoRedirect(HttpServletRequest request, HttpServletResponse response, String message){
         RequestDispatcher requestDispatcher = request.getRequestDispatcher("/info.tiles");
         request.setAttribute("info", message);
@@ -34,16 +34,13 @@ public class CommandTemplate implements Command {
     public void dispatcherForward(HttpServletRequest request, HttpServletResponse response, RequestDispatcher requestDispatcher) {
         try {
             requestDispatcher.forward(request, response);
-        } catch (ServletException e) {
-            logger.error("Forward", e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Forward", e);
         }
     }
 
     public boolean isAccessNotPermitted(HttpServletRequest request, HttpServletResponse response) {
         User user = (User) request.getSession().getAttribute("user");
-        RequestDispatcher requestDispatcher = null;
         if (user == null || !user.getIsAdmin() ) {
             infoRedirect(request, response, "LOG_IN_WARN");
             return true;
@@ -56,11 +53,16 @@ public class CommandTemplate implements Command {
         User user = new User();
         try {
             BeanUtils.populate(user, request.getParameterMap());
-        } catch (IllegalAccessException e) {
-            logger.error("BeanUtilsError", e);
-        } catch (InvocationTargetException e) {
+        } catch (ReflectiveOperationException e) {
             logger.error("BeanUtilsError", e);
         }
         return user;
+    }
+
+    public RequestDispatcher getSamePageDispatcher(HttpServletRequest request) {
+        String[] path = request.getServletPath().split("/");
+        if (path.length < 2)
+            return request.getRequestDispatcher("/index" +".tiles");
+        return request.getRequestDispatcher("/"+ path[1] +".tiles");
     }
 }

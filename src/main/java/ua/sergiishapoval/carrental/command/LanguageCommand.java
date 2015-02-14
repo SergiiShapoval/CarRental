@@ -14,14 +14,13 @@ import java.util.Locale;
 /**
  * Created by Сергей on 27.12.2014.
  */
-public class LanguageCommand implements Command {
+public class LanguageCommand extends CommandTemplate {
     private static final Logger logger = LoggerFactory.getLogger(LanguageCommand.class);
     
     
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
-        String language = null;
-        language = request.getParameter("lang_id");
+        String language = request.getParameter("lang_id");
         if ((language) != null) {
             HttpSession httpSession = request.getSession();
             httpSession.setAttribute("lang_id", language);
@@ -29,21 +28,18 @@ public class LanguageCommand implements Command {
             Locale.setDefault(locale);
         }
 
-/*path handling to show on the same page start*/
-        String[] path = request.getServletPath().split("/");
-        Integer pageNumber = null;
-        RequestDispatcher requestDispatcher = null;
-        if (path.length < 2)
-            requestDispatcher = request.getRequestDispatcher("/index" +".tiles");
-        else 
-            requestDispatcher = request.getRequestDispatcher("/"+ path[1] +".tiles");
- /*path handling to show on the same page end*/
+        dispatchOnSamePage(request, response);
+    }
+
+    private void dispatchOnSamePage(HttpServletRequest request, HttpServletResponse response) {
+        RequestDispatcher requestDispatcher = getSamePageDispatcher(request);
+
         try {
             requestDispatcher.forward(request, response);
-        } catch (ServletException e) {
-            logger.error("Forward", e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Forward", e);
         }
     }
+
+
 }
