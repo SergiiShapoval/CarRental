@@ -6,15 +6,23 @@
 <html>
 <head>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <c:url value="/css/bootstrap.min.css" var="bootsrapMin" />
+    <link rel="stylesheet" href="${bootsrapMin}"/>
+    <%--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">--%>
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
-    <script src="https://code.jquery.com/jquery-1.11.1.min.js" ></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <%--jquery cdn--%>
-    <%--<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>--%>
+    <c:url value="/css/bootstrap-theme.min.css" var="bootsrapTheme" />
+    <link rel="stylesheet" href="${bootsrapTheme}"/>
+    <%--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">--%>
+    <c:url value="/js/jquery-1.11.1.min.js" var="jquery1111" />
+    <script src="${jquery1111}"> </script>
+    <%--<script src="https://code.jquery.com/jquery-1.11.1.min.js" ></script>--%>
+    <c:url value="/js/bootstrap.min.js" var="bootstrapJS" />
+    <script src="${bootstrapJS}"> </script>
+    <%--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>--%>
     <title><tiles:getAsString name="title"/></title>
-    <link rel="shortcut icon" href="https://lh6.googleusercontent.com/-hT32iGH_vO4/VK4DWz6AuUI/AAAAAAAAHbY/EMr2BDjydqs/s16/favicon.jpg" type="image/jpg">
+    <c:url value="/img/favicon.ico.png" var="favicon"/>
+    <link rel="shortcut icon" href="${favicon}" type="image/jpg">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='http://fonts.googleapis.com/css?family=Ubuntu+Condensed&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
     <style type="text/css">

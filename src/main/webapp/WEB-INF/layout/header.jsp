@@ -40,7 +40,9 @@
     <table>
         <tr>
             <td class="col-md-3">
-                <img src="http://www.familyrentalcars.com/images/bodrum.family.rental.cars.png" style="max-width:320px;" >
+                <c:url value="/img/family.rental.cars.png" var="headerImg"/>
+                <img src="${headerImg}" style="max-width:320px;"/>
+                <%--<img src="http://www.familyrentalcars.com/images/bodrum.family.rental.cars.png" style="max-width:320px;" />--%>
             </td>
             <td class="col-md-9" style="vertical-align: middle; display: table-cell; text-align: right" >
                 <h1 style="color: #1C75BC; font-weight: bold">   <fmt:message key="HEADER_TITLE"/> </h1>
